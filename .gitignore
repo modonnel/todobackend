@@ -1,0 +1,6 @@
+# ingnore the virtual environment
+venv
+# ignore copiled Python
+*.pyc
+# ignore SQLite database files
+*.sqlite3
