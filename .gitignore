@@ -4,3 +4,15 @@ venv
 *.pyc
 # ignore SQLite database files
 *.sqlite3
+
+# Ignore test artifacts
+src/.coverage
+src/*.xml
+
+# Ignore eggs
+src/*egg-info
+
+# Ignore build and test artifacts
+target
+reports
+
