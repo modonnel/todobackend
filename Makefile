@@ -1,3 +1,4 @@
+# Project variables
 PROJECT_NAME ?= todobackend
 ORG_NAME ?= modonnel
 REPO_NAME ?= todobackend
@@ -95,6 +96,8 @@ clean:
 
 tag:
 	${INFO} "Tagging release image with tags $(TAG_ARGS)..."
+	${INFO} "APP_CONTAINER_ID == $(APP_CONTAINER_ID)..."
+	${INFO} "IMAGE_ID == $(IMAGE_ID)..."
 	@ $(foreach tag, $(TAG_ARGS), docker tag $(IMAGE_ID) $(DOCKER_REGISTRY)/$(ORG_NAME)/$(REPO_NAME):$(tag);)
 	${INFO} "Tagging complete"
 
@@ -119,6 +122,7 @@ publish:
 	${INFO} "Publishing release image $(IMAGE_ID) to $(DOCKER_REGISTRY)/$(ORG_NAME)/$(REPO_NAME)..."
 	${INFO} "Publishing release tags $(REPO_EXPR) ..."
 	@ $(foreach tag,$(shell echo $(REPO_EXPR)), docker push $(tag);)
+	@ $(foreach tag,$(shell echo $(REPO_EXPR)), echo "docker push $(tag)";)
 	${INFO} "Publish complete"
 
 # Cosmetics
@@ -131,34 +135,30 @@ INFO := @bash -c '\
   echo "=> $$1"; \
   printf $(NC)' VALUE
 
-# Get container id of appliation service container
+# Get container id of application service container
 APP_CONTAINER_ID := $$(docker-compose -p $(REL_PROJECT) -f $(REL_COMPOSE_FILE) ps -q $(APP_SERVICE_NAME))
-
 
 # Get image id of application service
 IMAGE_ID := $$(docker inspect -f '{{ .Image }}' $(APP_CONTAINER_ID))
 
 # Repository Filter
 ifeq ($(DOCKER_REGISTRY), docker.io)
-    REPO_FILTER := $(ORG_NAME)/$(REPO_NAME)[^[:space:]|\$$]*
+	REPO_FILTER := $(ORG_NAME)/$(REPO_NAME)[^[:space:]|\$$]*
 else
-    REPO_FILTER := $(DOCKER_REGISTRY)/$(ORG_NAME)/$(REPO_NAME)[^[:space:]|\$$]*
+	REPO_FILTER := $(DOCKER_REGISTRY)/$(ORG_NAME)/$(REPO_NAME)[^[:space:]|\$$]*
 endif
 
-
 # Introspect repository tags
-REPO_EXPR := $$(docker inspect -f '{{range .RepoTags}}{{.}} {{end}}' $(IMAGE_ID) | grep -oh "$(REPO_FILTER)" |xargs)
+REPO_EXPR := $$(docker inspect -f '{{range .RepoTags}}{{.}} {{end}}' $(IMAGE_ID) | grep -oh "$(REPO_FILTER)" | xargs)
 
 # Extract build tag arguments
 ifeq (buildtag,$(firstword $(MAKECMDGOALS)))
-  BUILDTAG_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+	BUILDTAG_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
   ifeq ($(BUILDTAG_ARGS),)
-    $(error You must specify a tag)
+	$(error You must specify a tag)
   endif
   $(eval $(BUILDTAG_ARGS):;@:)
 endif
-
-
 
 # Extract tag arguments
 ifeq (tag,$(firstword $(MAKECMDGOALS)))
