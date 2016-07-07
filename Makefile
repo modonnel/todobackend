@@ -108,8 +108,8 @@ buildtag:
 
 login:
 	${INFO} "Logging in to Docker registry $(DOCKER_REGISTRY)..."
-	@ docker login -u $$DOCKER_USER -p $$DOCKER_PASSWORD -e $$DOCKER_EMAIL $(DOCKER_REGISTRY)
-#	@ docker login -u $$DOCKER_USER -p $$DOCKER_PASSWORD -e $$DOCKER_EMAIL $(DOCKER_REGISTRY_AUTH)
+#	@ docker login -u $$DOCKER_USER -p $$DOCKER_PASSWORD -e $$DOCKER_EMAIL $(DOCKER_REGISTRY)
+	@ docker login -u $$DOCKER_USER -p $$DOCKER_PASSWORD -e $$DOCKER_EMAIL $(DOCKER_REGISTRY_AUTH)
 #	@ docker login -u $$DOCKER_USER -p $$DOCKER_PASSWORD $($$DOCKER_REGISTRY_AUTH)
 	${INFO} "Logged in to Docker registry $$DOCKER_REGISTRY..."
 
@@ -122,7 +122,6 @@ publish:
 	${INFO} "Publishing release image $(IMAGE_ID) to $(DOCKER_REGISTRY)/$(ORG_NAME)/$(REPO_NAME)..."
 	${INFO} "Publishing release tags $(REPO_EXPR) ..."
 	@ $(foreach tag,$(shell echo $(REPO_EXPR)), docker push $(tag);)
-	@ $(foreach tag,$(shell echo $(REPO_EXPR)), echo "docker push $(tag)";)
 	${INFO} "Publish complete"
 
 # Cosmetics
