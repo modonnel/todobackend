@@ -19,6 +19,7 @@ node {
                 "DOCKER_EMAIL=${DOCKER_EMAIL}"]){
             sh "make login"
         }
+        sh "make publish"
     }
     finally {
         stage 'Collect test reports'
